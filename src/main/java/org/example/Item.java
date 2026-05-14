@@ -16,6 +16,12 @@ public abstract class Item {
 
     private static int nextId = 1;
 
+    public Item(String id, String title, ItemStatus status) {
+        this.id = id;
+        this.title = title;
+        this.status = status;
+    }
+
     /**
      * Allocates the next Id
      * @return the id formated ex: I-00001
@@ -44,5 +50,13 @@ public abstract class Item {
             return 0;
         }
         return Integer.parseInt(id.substring(2));
+    }
+
+    /**
+     * Chekcs if the copy is borrowable (only when in store)
+     * @return true if so
+     */
+    public boolean isBorrowableCopy() {
+        return status == ItemStatus.IN_STORE;
     }
 }
