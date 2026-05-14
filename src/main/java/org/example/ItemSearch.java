@@ -12,6 +12,23 @@ public class ItemSearch {
     }
 
     /**
+     * searches recurisvely and keeps first copy per duplicated key
+     * @param items input items
+     * @param keyword input keyword
+     * @return the ordered matches
+     */
+    public static List<Item> searchRecursive(List<Item> items, String keyword) {
+        if (keyword == null || keyword.trim().isEmpty()) {
+            return new ArrayList<>();
+        }
+        String q = keyword.trim().toLowerCase();
+        List<Item> matches = new ArrayList<>();
+        Set<String> seenKeys = new HashSet<>();
+        recurse(items, q, 0, matches, seenKeys);
+        return matches;
+    }
+
+    /**
      * recursive search and seen key from item, keyword, index matches and ealready seen keys
      * @param items the input items
      * @param lowerKeyword the input keyword
