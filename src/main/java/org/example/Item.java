@@ -27,7 +27,7 @@ public abstract class Item {
      * @return the id formated ex: I-00001
      */
     public static String allocateNextItemId() {
-        return String.format("I-%05d", nextId++); // Better than having the usual %04d which is ionly ex: 0001
+        return String.format("I-%05d", nextId++); // Better than having the usual %04d which is ionly ex: 0001 as Users will have their own prefix "U" and Items "I"
     }
 
     /**
