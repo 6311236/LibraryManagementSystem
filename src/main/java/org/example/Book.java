@@ -18,4 +18,15 @@ public class Book extends Item{
         this.author = author;
         this.genre = genre;
     }
+
+    /**
+     * Validates if the ISBN is correct before accepting new value (will throw exception when invalid)
+     * @param isbn the input isbn
+     */
+    public void setIsbnValidated(String isbn) {
+        if (!Validation.isValidISBN(isbn)) {
+            throw new IllegalArgumentException("ISBN must be 13 digits.");
+        }
+        this.isbn = isbn;
+    }
 }
