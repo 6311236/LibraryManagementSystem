@@ -1,6 +1,6 @@
 package org.example;
 
-public class Validation {
+public final class Validation {
 
     /**
      * Validates ISBN as exactly 13 decimal digits
