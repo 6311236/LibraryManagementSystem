@@ -6,6 +6,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public final class LibraryCsvSupport {
@@ -79,5 +80,70 @@ public final class LibraryCsvSupport {
         } catch (NumberFormatException ex) {
             throw new IllegalArgumentException("Invalid integer for " + field + ": " + text, ex);
         }
+    }
+
+    /**
+     * Returns a string label describing what kind of user this is
+     * @param user the user to check
+     * @return a string representing the users type
+     */
+    private static String describeUserKind(User user) {
+        if (user instanceof Student) {
+            return "STUDENT";
+        }
+        if (user instanceof Teacher) {
+            return "TEACHER";
+        }
+        if (user instanceof Admin) {
+            return "ADMIN";
+        }
+        return "USER";
+    }
+
+    /**
+     * Converts an Item into a single CSV row string
+     * @param item the item to serialize (must be a book, dvd, or magazine)
+     * @return a comma separated string for the item
+     */
+    private static String serializeItem(Item item) {
+        String[] row = new String[ITEM_HEADER.length];
+        Arrays.fill(row, "");
+        row[1] = escape(item.getId());
+        row[2] = escape(item.getTitle());
+        row[3] = item.getStatus().name();
+        if (item instanceof Book book) {
+            row[0] = "BOOK";
+            row[4] = escape(book.getIsbn());
+            row[5] = escape(book.getAuthor());
+            row[6] = escape(book.getGenre());
+        } else if (item instanceof DVD dvd) {
+            row[0] = "DVD";
+            row[7] = escape(dvd.getDirector());
+            row[8] = Integer.toString(dvd.getDurationMinutes());
+        } else if (item instanceof Magazine magazine) {
+            row[0] = "MAGAZINE";
+            row[9] = Integer.toString(magazine.getIssueNumber());
+            row[10] = escape(magazine.getPublisher());
+        } else {
+            throw new IllegalArgumentException("Unsupported item type: " + item.getClass());
+        }
+        return String.join(",", row);
+    }
+
+    /**
+     * Escapes a string value so its safe to use in a CSV file
+     * @param value the string to escape
+     * @return the escaped string or if not "" if null
+     */
+    private static String escape(String value) {
+        if (value == null) {
+            return "";
+        }
+        boolean needsQuotes = value.contains(",") || value.contains("\"") || value.contains("\n");
+        String sanitized = value.replace("\"", "\"\"");
+        if (needsQuotes) {
+            return "\"" + sanitized + "\"";
+        }
+        return sanitized;
     }
 }
