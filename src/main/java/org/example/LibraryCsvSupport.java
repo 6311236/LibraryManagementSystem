@@ -20,6 +20,70 @@ public final class LibraryCsvSupport {
     }
 
     /**
+     * Reads a list of users from a csv file from path
+     * @param path the input path to the user csv file
+     * @return a list of users parsed from the file
+     * @throws IOException if the file cant be read
+     */
+    public static List<User> readUsers(Path path) throws IOException {
+        List<User> users = new ArrayList<>();
+        if (!Files.exists(path)) {
+            return users;
+        }
+        try (BufferedReader reader = Files.newBufferedReader(path, StandardCharsets.UTF_8)) {
+            String line;
+            boolean headerConsumed = false;
+            while ((line = reader.readLine()) != null) {
+                if (line.isBlank() || line.startsWith("#")) {
+                    continue;
+                }
+                if (!headerConsumed) {
+                    headerConsumed = true;
+                    if (line.toUpperCase().startsWith("KIND")) {
+                        continue;
+                    }
+                }
+                users.add(parseUserLine(line));
+            }
+        }
+        int maxSeq = users.stream().mapToInt(u -> User.extractSequence(u.getId())).max().orElse(0);
+        User.seedUserIdSequence(maxSeq + 1);
+        return users;
+    }
+
+    /**
+     * Reads a list of items from a csv file from path
+     * @param path the input path to the item csv file
+     * @return a list of items parsed from the file
+     * @throws IOException if the file cant be read
+     */
+    public static List<Item> readItems(Path path) throws IOException {
+        List<Item> items = new ArrayList<>();
+        if (!Files.exists(path)) {
+            return items;
+        }
+        try (BufferedReader reader = Files.newBufferedReader(path, StandardCharsets.UTF_8)) {
+            String line;
+            boolean headerConsumed = false;
+            while ((line = reader.readLine()) != null) {
+                if (line.isBlank() || line.startsWith("#")) {
+                    continue;
+                }
+                if (!headerConsumed) {
+                    headerConsumed = true;
+                    if (line.toUpperCase().startsWith("KIND")) {
+                        continue;
+                    }
+                }
+                items.add(parseItemLine(line));
+            }
+        }
+        int maxSeq = items.stream().mapToInt(i -> Item.extractSequence(i.getId())).max().orElse(0);
+        Item.seedItemIdSequence(maxSeq + 1);
+        return items;
+    }
+
+    /**
      * Takes a CSV line and returns the correct User object
      * @param line a csv line from users.csv
      * @return the User object
