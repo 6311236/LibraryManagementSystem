@@ -1,6 +1,7 @@
 package org.example;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -81,6 +82,46 @@ public final class LibraryCsvSupport {
         int maxSeq = items.stream().mapToInt(i -> Item.extractSequence(i.getId())).max().orElse(0);
         Item.seedItemIdSequence(maxSeq + 1);
         return items;
+    }
+
+    /**
+     * Writes a list of users to a csv file from a given path
+     * @param path the inp[ut path where the csv file will be written
+     * @param users the input list of users to write
+     * @throws IOException if the file cannot be written
+     */
+    public static void writeUsers(Path path, List<User> users) throws IOException {
+        Files.createDirectories(path.getParent());
+        try (BufferedWriter writer = Files.newBufferedWriter(path, StandardCharsets.UTF_8)) {
+            writer.write("KIND,id,name");
+            writer.newLine();
+            for (User user : users) {
+                writer.write(describeUserKind(user));
+                writer.write(',');
+                writer.write(escape(user.getId()));
+                writer.write(',');
+                writer.write(escape(user.getName()));
+                writer.newLine();
+            }
+        }
+    }
+
+    /**
+     * Writes a list of items to a csv file from a given path
+     * @param path the input path where the csv file will be written
+     * @param items the input list of items to write
+     * @throws IOException if the file cannot be written
+     */
+    public static void writeItems(Path path, List<Item> items) throws IOException {
+        Files.createDirectories(path.getParent());
+        try (BufferedWriter writer = Files.newBufferedWriter(path, StandardCharsets.UTF_8)) {
+            writer.write(String.join(",", ITEM_HEADER));
+            writer.newLine();
+            for (Item item : items) {
+                writer.write(serializeItem(item));
+                writer.newLine();
+            }
+        }
     }
 
     /**
